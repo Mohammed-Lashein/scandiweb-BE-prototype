@@ -67,4 +67,61 @@ ___
 **Note 3** first time to encounter the error "Constant expression
 contains invalid operations"
 
-I found [this answer on stack overflow](https://stackoverflow.com/questions/40171546/php-error-fatal-error-constant-expression-contains-invalid-operations)
+Although a misleading error, I thought is was due to storing a
+sql statement in a string (which is totally non-sense) but after
+reading and carefully inspecting the line causing the error it
+seems that is was this line 
+```
+private $pdo = Container::get('ActiveRecordLearningDBPDOConn');
+``` 
+
+The reason of the error : The line
+```Container::get('ActiveRecordLearningDBPDOConn')``` can't be
+evaluated at compile time (it will be evaluated at runtime) and
+you can't assign values to constants or class properties like
+that .
+
+I also found [this answer on stack
+overflow](https://stackoverflow.com/questions/40171546/php-error-fatal-error-constant-expression-contains-invalid-operations)
+
+___
+**Note 4**
+Taken this test : 
+```
+test("create multiple bookmark links", function() {
+  $link1 = new Bookmark;
+  $link1->url = 'https://yahoo.com';
+  $link1->name = 'yahoo';
+  $link1->description = 'yahoo link1';
+  $link1->tag = 'like facebook';
+
+  $link1->save();
+  expect($link1->getId())->toEqual(1);
+  
+  $link2 = new Bookmark;
+  $link2->url = 'https://facebook.com';
+  $link2->name = 'facebook';
+  $link2->description = 'facebook link2';
+  $link2->tag = 'fb made react and gql';
+
+  $link2->save();
+  expect($link2->getId())->toEqual(2);
+
+  /* 
+      expect($link1->getId())->toEqual(1);
+      expect($link2->getId())->toEqual(2);
+  */
+});
+```
+
+At first, I placed the expectations in the commented way, the
+test failed with the error saying 'Failed asserting that '2'
+matches expected 1.' at it was pointing to the 1st expect !
+
+This was mentioned in php docs regarding PDO::lastInsertId(), where
+it returns the latest value of the auto_increment as a result of
+the most recently executed INSERT statement.
+
+This info is mentioned
+[in a comment in php docs](https://www.php.net/manual/en/pdo.lastinsertid.php#122009)
+

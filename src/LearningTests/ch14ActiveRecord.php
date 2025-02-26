@@ -79,11 +79,13 @@ class Bookmark {
   public $name;
   public $description;
   public $tag;
+  private $pdo;
 
   /**
    * @var PDO $pdo
    */
-  private $pdo = Container::get('ActiveRecordLearningDBPDOConn');
+  // The below line causes errors (explanation in the md file)
+ // private $pdo = Container::get('ActiveRecordLearningDBPDOConn');
   const INSERT_QUERY = "INSERT INTO bookmark (
       url,
       name,
@@ -96,7 +98,9 @@ class Bookmark {
       );";
   // const getIdQuery = "";
 
-  public function __construct() {}
+  public function __construct() {
+    $this->pdo = Container::get('ActiveRecordLearningDBPDOConn');
+  }
   public function save() {
     $stmt = $this->pdo->prepare(static::INSERT_QUERY);
     $stmt->execute([
