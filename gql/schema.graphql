@@ -1,0 +1,29 @@
+schema {
+  query : Query
+}
+
+type Query {
+  product(id: ID): Product
+  products: [Product]
+  category(id: ID): Category
+  categories: [Category]
+  """
+  Here we can write our comments . 
+
+  Why above we didn't prefix the param with $ ?
+  => Good insight . 
+
+  If the var is in the type definition of the schema, we don't prefix it with $ , while
+  if the var is being referred to in a  mutation  expecting a var, then we will prefix it with $ . 
+
+  Eg : 
+  mutation deleteClient($id: ID) {
+    deleteClient(id: $id) {
+      id 
+      name
+      phone 
+      email
+    }
+  }
+  """
+}

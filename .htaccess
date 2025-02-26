@@ -1,0 +1,19 @@
+# php_flag xdebug.overload_var_dump On
+# php_value xdebug.mode develop
+
+# # Test rule to see if .htaccess is working
+# php_value display_errors 1
+
+# #SetEnv XDEBUG_CONFIG "cli_color=1 mode=develop"
+
+# SetEnv HERD_PHP_83_INI_SCAN_DIR "/Users/mohammedlashein/Library/Application Support/Herd/config/php/83/"
+# SetEnv PATH "/Users/mohammedlashein/Library/Application Support/Herd/bin/:$PATH"
+# php_value PHPRC "/Users/mohammedlashein/Library/Application Support/Herd/config/php/83/"
+
+# #LoadModule php_module "/Users/mohammedlashein/Library/ApplicationSupport/Herd/bin/php"
+
+# PHPIniDir "/Users/mohammedlashein/Library/Application Support/Herd/config/php/83/"
+
+
+
+
