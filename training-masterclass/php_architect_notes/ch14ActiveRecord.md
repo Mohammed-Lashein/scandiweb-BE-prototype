@@ -123,5 +123,53 @@ it returns the latest value of the auto_increment as a result of
 the most recently executed INSERT statement.
 
 This info is mentioned
-[in a comment in php docs](https://www.php.net/manual/en/pdo.lastinsertid.php#122009)
+[in a comment in php
+docs](https://www.php.net/manual/en/pdo.lastinsertid.php#122009)
+___
+**Note 5** : Taken this code : 
+```
+public function create($attributes) {
+    // create new instance
+    $instance = new static;
+    // get intersecting keys
+    foreach($attributes as $key => $value) {
+      if(in_array($key, $instance->fillable)) {
+        // foreach key assign its value to the corresponding obj property
+        $instance->$key = $value;
+      }
+    }
+    // call save method
+    $instance->save();
+    return $instance;
+  }
+```
+How are we accessing ```$instance->fillable``` even though
+fillable property is protected so can't be accessed from an
+instance ?
+
+=> Since we are still in the class body, we can access that
+property . It will be inaccessible if we tried to access it
+outside of the class . 
+
+___
+In the test having the label "Find bookmarks by description", I
+wondered how on dumping info about the result of the
+findByDescription() the id in the returned elements is null . 
+
+After carefully looking at the code, I found the issue . 
+I looped over the query result to return each array into an
+instance of the Bookmark class .
+And since the id property is not present in the fillable array,
+it didn't get a value from the query result . 
+
+Then how does the test ```expect($res[0]->getId())->toBe(1);```
+not fail ?
+=> Simply because in the getId() implementation, we are querying
+the db for the element id based on the url (which is expected to
+be specific for each instance) thus we get the correct id . 
+
+It is a bit weird functionality, but since this chapter focuses
+more on testing and learning Active Record pattern, I won't
+bother with these side issues (Maybe you can try tackling it as a
+challenge !) 
 

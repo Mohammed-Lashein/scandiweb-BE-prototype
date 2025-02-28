@@ -2,8 +2,8 @@
 
 use Core\ActiveRecordLearningDB;
 use Core\Container;
-
 require __DIR__ . '/../../src/LearningTests/ch14ActiveRecord.php';
+
 
 
 Container::bind('ActiveRecordLearningDBPDOConn', function() {
@@ -19,7 +19,9 @@ beforeEach(function() {
   $pdo->query('drop table bookmark');
   $pdo->query(BOOKMARK_TABLE_DDL);
 });
-
+afterEach(function() {
+  Mockery::close();
+});
 describe("bookmark table reset", function() {
   /**
    * @var PDO $pdo
@@ -75,7 +77,7 @@ test("create a new Bookmark link", function() {
   }
 });
 
-test("create multiple bookmark links", function() {
+test("create multiple bookmark links manually", function() {
   $link1 = new Bookmark;
   $link1->url = 'https://yahoo.com';
   $link1->name = 'yahoo';
@@ -98,4 +100,78 @@ test("create multiple bookmark links", function() {
       expect($link1->getId())->toEqual(1);
       expect($link2->getId())->toEqual(2);
   */
+});
+test("create multiple bookmarks using create static method", function() {
+  $link1 = Bookmark::create([
+    'url' => 'gql.com',
+    'name' => 'gql',
+    'description' => 'gql is harder to learn than rest',
+    'tag' => 'fb'
+  ]);
+
+  $link2 = Bookmark::create([
+    'url' => 'hasura.com',
+    'name' => 'hasura',
+    'description' => 'hasura is harder to learn than rest',
+    'tag' => 'hasura inc'
+  ]);
+  
+  expect($link1->name)->toEqual('gql');
+  expect($link2->name)->toEqual('hasura');
+});
+test("find created bookmark by id", function() {
+  Bookmark::create([
+    'url' => 'gql.com',
+    'name' => 'gql',
+    'description' => 'gql is harder to learn than rest',
+    'tag' => 'fb'
+  ]);
+  $link = Bookmark::find(1);
+
+  expect($link)->toBeInstanceOf(Bookmark::class);
+  expect($link->name)->toBe('gql');
+  expect($link->getId())->toEqual(1);
+});
+
+test("DB fails gracefully", function() {
+  $mockedDB = Mockery::mock((Container::get("ActiveRecordLearningDBPDOConn"))::class);
+
+  $mockedDB
+  ->shouldReceive('prepare')
+  ->andReturn(false);
+
+
+  $link = new Bookmark($mockedDB);
+
+  $link->save();
+  /*
+  In pest, the 2nd param for throws() is a string to search
+  for in the Error or Exception message . It needn't be an exact
+  match .  
+  */
+})->throws(Exception::class, "An error occurred");
+
+test("Find bookmarks by description", function() {
+  Bookmark::create([
+    'name' => 'max blog',
+    'url' => 'https://frontendatscale.com',
+    'description' => 'good FE blog ',
+    'tag' => 'FE'
+  ]);
+  
+  Bookmark::create([
+    'name' => 'kp website',
+    'url' => 'https://kevinpowell.com',
+    'description' => 'good css blog ',
+    'tag' => 'css'
+  ]);
+  $res = Bookmark::findByDescription('blog');
+
+  // var_dump('res from test');
+  // var_dump($res[0]->getId());
+  // var_dump($res);
+
+  expect(count($res))->toBe(2);
+  expect($res[0]->getId())->toBe(1);
+  expect($res[1]->tag)->toBe('css');
 });

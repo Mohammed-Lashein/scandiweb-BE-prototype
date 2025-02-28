@@ -75,11 +75,16 @@ differences:  https://www.atlassian.com/data/sql/single-double-quote-and-backtic
 */
 
 class Bookmark {
+  private $id;
   public $url;
   public $name;
   public $description;
   public $tag;
+  /**
+    * @var PDO pdo
+   */
   private $pdo;
+  private $fillable = ['url', 'name', 'description', 'tag'];
 
   /**
    * @var PDO $pdo
@@ -97,21 +102,97 @@ class Bookmark {
       ?, ?, ?, ?, NOW(), NOW()
       );";
   // const getIdQuery = "";
+  const FIND_BY_ID_QUERY = "SELECT * FROM bookmark WHERE id = ? LIMIT 1;";
+  const FIND_BY_DESCRIPTION_QUERY = "SELECT * FROM bookmark WHERE description like ?";
 
-  public function __construct() {
-    $this->pdo = Container::get('ActiveRecordLearningDBPDOConn');
+  public function __construct($pdo = null) {
+    $this->pdo = $pdo ?? Container::get('ActiveRecordLearningDBPDOConn');
   }
   public function save() {
     $stmt = $this->pdo->prepare(static::INSERT_QUERY);
-    $stmt->execute([
-      $this->url,
-      $this->name, 
-      $this->description, 
-      $this->tag
-    ]);
+
+    // This condition is important for testing , where we return
+    // false from prepare() to test our code when the db is not working
+    if($stmt) {
+      $stmt->execute([
+        $this->url,
+        $this->name, 
+        $this->description, 
+        $this->tag
+      ]);
+      return;
+    }
+    throw new Exception('An error occurred while trying to connect to DB');
   }
   public function getId() {
-    return $this->pdo->lastInsertId();
+    if($this->id) {
+      return $this->id;
+    }
+
+    $stmt = $this->pdo->prepare("select id from bookmark where url = ?");
+    $stmt->execute([$this->url]);
+    $res = $stmt->fetch();
+    $id = $res['id'];
+    return $id;
+    // return $this->pdo->lastInsertId();
+  }
+  public static function create($attributes) {
+    // create new instance
+    $instance = new static;
+    // get intersecting keys
+    foreach($attributes as $key => $value) {
+      if(in_array($key, $instance->fillable) || $key == 'id') {
+        // foreach key assign its value to the corresponding instance property
+        $instance->$key = $value;
+      }
+    }
+    // call save method
+    $instance->save();
+    return $instance;
+  }
+  /* 
+  TODO : I don't know whether to name it find or getOne .
+
+  Mahmoud used getOne in the db internals, while for the model he
+  used find (which makes sense) . 
+   */
+  public static function find($id) {
+    $model = new static;
+    $stmt = $model->pdo->prepare(static::FIND_BY_ID_QUERY);
+    /* Note that you should use fetch or fetchAll as execute()
+returns just a boolean */
+    $stmt->execute([$id]);
+    $res = $stmt->fetch();
+
+    foreach($res as $key => $value) {
+      if(in_array($key, $model->fillable))
+      $model->$key = $value;
+    }
+    return $model;
+  }
+  public static function findByDescription($desc) {
+    // query the db
+    $pdo = Container::get('ActiveRecordLearningDBPDOConn');
+    $stmt = $pdo->prepare(static::FIND_BY_DESCRIPTION_QUERY);
+    $stmt->execute(["%$desc%"]);
+    // store the res in an array
+    $res = $stmt->fetchAll();
+    // var_dump('this is res of findByDescription');
+    // var_dump($res);
+
+    // create an intermediate array
+    $bookmarks_instances = [];
+    foreach($res as $row) {
+      $instance = new static;
+      foreach($row as $key => $value) {
+        if(in_array($key, $instance->fillable)) {
+          $instance->$key = $value;
+        }
+      }
+      $bookmarks_instances[] = $instance;
+    }
+    // return the arr of Bookmark instances
+    return $bookmarks_instances;
   }
 }
 

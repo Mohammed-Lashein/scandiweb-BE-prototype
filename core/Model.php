@@ -2,6 +2,11 @@
 
 namespace Core;
 
+/* 
+  In laravel you can inspect the source code from 
+  src/Illuminate/Database/Eloquent/Model.php
+*/
+
 class Model {
   protected static $table;
   protected static $pdo;
