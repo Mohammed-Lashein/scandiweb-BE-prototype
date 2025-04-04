@@ -1,0 +1,1 @@
+Here I try to create scandiweb backend for full stack test assignment along with learning design patterns and unit testing from [architect's guide to php design patterns book](https://www.amazon.com/php-architects-Guide-Design-Patterns/dp/0973589825)
