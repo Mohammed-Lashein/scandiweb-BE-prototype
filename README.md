@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # This repo is intended to train on scandiweb fullstack task (the backend part) . 
 
 I try to implement some of the features  [from this repo](https://github.com/SH1R3F/Scandiweb-fullstack-task)
