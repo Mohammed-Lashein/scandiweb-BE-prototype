@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # This repo is intended to train on scandiweb fullstack task (the backend part) . 
 
 I try to implement some of the features  [from this repo](https://github.com/SH1R3F/Scandiweb-fullstack-task)
@@ -13,3 +14,4 @@ Additionally, I provide :
 - **popps book** : It is php 8 objects, patterns and practice by Matt Zandstra  
 
 He used this abbreviation in the book as a [reference to the repo accompanying the book](https://github.com/Apress/php-8-objects-patterns-practice)
+
