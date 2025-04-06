@@ -1,7 +1,7 @@
 # Here I write notes about new things I learnt from this chapter
 
 **Note 1** : fetchAll() and describe statement
-```
+```php
 $desc = $pdo->query("DESCRIBE bookmark")->fetchAll(PDO::FETCH_COLUMN);
 ```
 
@@ -49,13 +49,13 @@ describe statement)
 
 ___
 **Note 2** I don't understand what this query returns : 
-```
+```php
 $count = $pdo->query('select count(*) from bookmark')->fetchColumn()
 ```
 
 Let's tackle it step by step : 
 - If you run the below code 
-```
+```php
 var_dump($pdo->query('select count(*) from bookmark')->fetchAll())
 ```
 You will get ```['count(*)' => 0]```
@@ -87,7 +87,7 @@ overflow](https://stackoverflow.com/questions/40171546/php-error-fatal-error-con
 ___
 **Note 4**
 Taken this test : 
-```
+```php
 test("create multiple bookmark links", function() {
   $link1 = new Bookmark;
   $link1->url = 'https://yahoo.com';
@@ -127,7 +127,7 @@ This info is mentioned
 docs](https://www.php.net/manual/en/pdo.lastinsertid.php#122009)
 ___
 **Note 5** : Taken this code : 
-```
+```php
 public function create($attributes) {
     // create new instance
     $instance = new static;
